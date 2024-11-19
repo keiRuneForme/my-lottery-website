@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สุ่มเลขและคำนวณโอกาส</title>
+    <style>
+        /* ธีมพื้นฐาน */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+            padding: 20px;
+            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        h1 {
+            color: #1d9f55;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        /* กราฟิกการสุ่มเลข */
+        .card {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .number-display {
+            font-size: 48px;
+            margin: 20px 0;
+            color: #2c3e50;
+            font-weight: bold;
+            padding: 10px;
+            background-color: #ecf0f1;
+            border-radius: 8px;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .input-field {
+            font-size: 20px;
+            padding: 10px;
+            margin: 10px 0;
+            width: 100px;
+            text-align: center;
+            border-radius: 5px;
+            border: 1px solid #bdc3c7;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin: 10px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: scale(1.1);
+        }
+
+        .clear-btn {
+            background-color: #e74c3c;
+        }
+
+        .clear-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .chance-display {
+            font-size: 22px;
+            margin: 20px 0;
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        .formula-explanation {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-top: 20px;
+        }
+
+        .history {
+            margin-top: 30px;
+            text-align: left;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .history h2 {
+            text-align: center;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .history ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .history li {
+            background-color: #ecf0f1;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        /* โหมดมืด */
+        .dark-mode {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+        }
+
+        .dark-mode .container {
+            background-color: #34495e;
+        }
+
+        .dark-mode .number-display {
+            background-color: #34495e;
+            color: #ecf0f1;
+        }
+
+        .dark-mode button {
+            background-color: #3498db;
+        }
+
+        .dark-mode .chance-display {
+            color: #2ecc71;
+        }
+
+        .dark-mode .history li {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+        }
+
+        .dark-mode .formula-explanation {
+            color: #95a5a6;
+        }
+
+        .dark-mode .clear-btn {
+            background-color: #e74c3c;
+        }
+
+        .theme-toggle-btn {
+            background-color: #2c3e50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        .theme-toggle-btn:hover {
+            background-color: #2980b9;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>สุ่มเลขและคำนวณโอกาสในการถูกรางวัล</h1>
+
+        <!-- ช่องกรอกหมายเลข -->
+        <div>
+            <label for="userNumber">กรอกหมายเลขที่ต้องการ (เลข 2, 3 หรือ 6 หลัก):</label>
+            <input type="text" id="userNumber" class="input-field" maxlength="6" placeholder="กรอกเลข">
+        </div>
+
+        <!-- ปุ่มสุ่มเลข -->
+        <button onclick="startRandomAnimation(6)">สุ่มเลข 6 หลัก</button>
+        <button onclick="startRandomAnimation(3)">สุ่มเลข 3 หลัก</button>
+        <button onclick="startRandomAnimation(2)">สุ่มเลข 2 หลัก</button>
+        <button class="clear-btn" onclick="clearHistory()">ล้างประวัติ</button>
+
+        <!-- แสดงกราฟิกการสุ่มเลข -->
+        <div class="card">
+            <div id="randomNumber" class="number-display">000000</div>
+        </div>
+
+        <!-- แสดงโอกาส -->
+        <div id="chanceDisplay" class="chance-display">โอกาสในการถูกรางวัล: 0%</div>
+
+        <!-- คำอธิบายสูตร -->
+        <div class="formula-explanation">
+            <p><strong>สูตรคำนวณโอกาส:</strong><br>
+            โอกาส = (1 / จำนวนตัวเลขทั้งหมด) * 100<br>
+            ตัวอย่าง: สำหรับเลข 6 หลัก จะมีจำนวนตัวเลขทั้งหมด 1,000,000 ตัวเลข<br>
+            โอกาสในการถูกรางวัล = (1 / 1,000,000) * 100 = 0.0001%</p>
+        </div>
+
+        <!-- ประวัติการสุ่ม -->
+        <div class="history">
+            <h2>ประวัติการสุ่มเลข</h2>
+            <ul id="historyList"></ul>
+        </div>
+
+        <!-- ปุ่มแชร์ -->
+        <button onclick="shareOnTwitter()">แชร์บน Twitter</button>
+
+        <!-- ปุ่มปรับโหมดมืด/สว่าง -->
+        <button class="theme-toggle-btn" onclick="toggleTheme()">สลับโหมดมืด/สว่าง</button>
+    </div>
+
+    <script>
+        // เพิ่มเสียง
+        const audio = new Audio('https://www.soundjay.com/button/beep-07.wav');
+
+        // ประวัติสำหรับตัวเลขแต่ละประเภท
+        let histories = {
+            6: JSON.parse(localStorage.getItem('numberHistory6')) || [],
+            3: JSON.parse(localStorage.getItem('numberHistory3')) || [],
+            2: JSON.parse(localStorage.getItem('numberHistory2')) || []
+        };
+
+        // ฟังก์ชันเริ่มการสุ่มเลข
+        function startRandomAnimation(digits) {
+            const display = document.getElementById('randomNumber');
+            let counter = 0;
+            const animationDuration = 3000; // เวลาอนิเมชั่น 3 วินาที
+            const intervalTime = 100; // เปลี่ยนตัวเลขทุก 100 มิลลิวินาที
+
+            // เล่นเสียงเมื่อเริ่มสุ่ม
+            audio.play();
+
+            const interval = setInterval(() => {
+                const randomNumber = Math.floor(Math.random() * Math.pow(10, digits));
+                display.textContent = String(randomNumber).padStart(digits, '0');
+                counter += intervalTime;
+                if (counter >= animationDuration) {
+                    clearInterval(interval);
+                    finalizeRandomNumber(digits);
+                }
+            }, intervalTime);
+        }
+
+        // ฟังก์ชันการคำนวณและแสดงโอกาส
+        function finalizeRandomNumber(digits) {
+            const number = document.getElementById('randomNumber').textContent;
+            const chance = (1 / Math.pow(10, digits)) * 100;
+            document.getElementById('chanceDisplay').textContent = `โอกาสในการถูกรางวัล: ${chance.toFixed(6)}%`;
+
+            // บันทึกประวัติ
+            histories[digits].push(number);
+            localStorage.setItem(`numberHistory${digits}`, JSON.stringify(histories[digits]));
+
+            // แสดงประวัติ
+            displayHistory();
+        }
+
+        // ฟังก์ชันแสดงประวัติการสุ่ม
+        function displayHistory() {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+
+            Object.keys(histories).forEach((length) => {
+                if (histories[length].length > 0) {
+                    const title = document.createElement('h3');
+                    title.textContent = `เลข ${length} หลัก`;
+                    historyList.appendChild(title);
+
+                    histories[length].forEach((num, index) => {
+                        const li = document.createElement('li');
+                        li.textContent = `${index + 1}. ${num}`;
+                        historyList.appendChild(li);
+                    });
+                }
+            });
+
+            if (historyList.innerHTML === '') {
+                historyList.innerHTML = '<li style="text-align: center; color: #aaa;">ยังไม่มีประวัติ</li>';
+            }
+        }
+
+        // ฟังก์ชันล้างประวัติ
+        function clearHistory() {
+            histories = { 6: [], 3: [], 2: [] };
+            localStorage.removeItem('numberHistory6');
+            localStorage.removeItem('numberHistory3');
+            localStorage.removeItem('numberHistory2');
+            displayHistory();
+        }
+
+        // ฟังก์ชันสลับโหมดมืด/สว่าง
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        // ฟังก์ชันแชร์บน Twitter
+        function shareOnTwitter() {
+            const url = `https://twitter.com/intent/tweet?text=ฉันเพิ่งสุ่มเลข 6 หลัก: ${document.getElementById('randomNumber').textContent}`;
+            window.open(url, '_blank');
+        }
+    </script>
+</body>
+</html>
