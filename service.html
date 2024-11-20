@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกี่ยวกับและคำนวณเปอร์เซ็นต์</title>
+    <style>
+        /* ใช้ CSS ที่เหมือนกับใน index.html */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            margin: 0 15px;
+        }
+
+        .navbar a:hover {
+            background-color: #575757;
+            color: #ffb347;
+        }
+
+        /* เนื้อหาของหน้า service */
+        .content {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 50px;
+        }
+        #result {
+            text-align: center;
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+        .form-container {
+            width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+            border-radius: 8px;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 100%;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #575757;
+        }
+        name {
+            text-align: center;
+        }
+        p {
+            padding: 1px;
+            font-size: smaller;
+            border: #575757;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+     <div class="navbar">
+        <a href="index.html">หน้าหลัก</a>
+        <a href="service.html">เกี่ยวกับ</a>
+        <a href="table.html">ข้อมูลตารางล็อตเตอรี่</a>
+    </div>
+
+    <h1>สูตรคำนวณอัตราร้อยละ</h1>
+    <div class="form-container">
+        <label for="userInput">กรุณากรอกหมายเลขที่คุณเลือก (6 หลัก):</label>
+        <input type="number" id="userInput" maxlength="6" placeholder="ตัวเลข 6 หลัก">
+        <button onclick="calculatePercentage()">คำนวณเปอร์เซ็นต์</button>
+        <div class="name">
+            <p>นายปริวัฒน์ หวานสนิท เลขที่ 5 ชั้น ม.5/1</p>
+            <p>นายสิรวิชญ์ ไกรเทพ เลขที่ 7 ชั้น ม.5/1</p>
+            <p>นายอังกูร บุญหนัก เลขที่ 8 ชั้น ม.5/1</p>
+            <p>นายณัชพล ทัดเทียม เลขที่ 26 ชั้น ม.5/1</p>
+        </div>
+    </div>
+
+    <div id="result"></div>
+
+    <script>
+        let historicalData = [];
+
+        // โหลดข้อมูลจาก history.json
+        fetch('history.json')
+            .then(response => response.json())
+            .then(data => {
+                historicalData = data;
+            })
+            .catch(error => {
+                console.error("เกิดข้อผิดพลาดในการโหลดข้อมูลประวัติ:", error);
+            });
+
+        function calculatePercentage() {
+            // รับค่าหมายเลขที่ผู้ใช้กรอก
+            const userNumber = document.getElementById('userInput').value.trim();
+
+            // ตรวจสอบว่าเป็นตัวเลข 6 หลัก
+            if (userNumber.length !== 6 || isNaN(userNumber)) {
+                alert("กรุณากรอกหมายเลข 6 หลัก");
+                return;
+            }
+
+            // คำนวณเปอร์เซ็นต์
+            let correctDigits = 0;
+            for (let i = 0; i < historicalData.length; i++) {
+                const historicalNumber = historicalData[i].number;
+
+                // เปรียบเทียบแต่ละหลัก
+                for (let j = 0; j < 6; j++) {
+                    if (userNumber[j] === historicalNumber[j]) {
+                        correctDigits++;
+                    }
+                }
+            }
+
+            // คำนวณเปอร์เซ็นต์
+            const percentage = (correctDigits / (historicalData.length * 6)) * 100;
+
+            // แสดงผล
+            document.getElementById('result').innerHTML = `คุณตรงกับหมายเลขจากประวัติ ${percentage.toFixed(2)}%`;
+        }
+    </script>
+</body>
+</html>
